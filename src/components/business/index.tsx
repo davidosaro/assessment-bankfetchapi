@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { request } from "../../api/apiService";
 import { MEAL } from "../../api/apiURL.js";
+import Notify from "../utils/Notify.ts";
 
 interface businessProps {
   searchValue?: string;
@@ -31,7 +32,6 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
       const result: BusinessResult = await response.json();
       if (result) {
         //
-        console.log(result.meals, 'meal')
         setLoading(false)
         setBusiness(result.meals)
         setLoadingBusiness(false);
@@ -40,8 +40,8 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
+        Notify(error.message, "error")
         setLoading(false)
-        console.log(error.message, "error")
       }
     }
   }
