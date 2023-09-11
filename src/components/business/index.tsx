@@ -26,6 +26,7 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
     strArea?: string,
     strCategory?: string,
     strInstructions?: string,
+    idMeal?: string,
   }
   interface BusinessResult {
     meals: Array<object>
@@ -37,6 +38,7 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
       const result: BusinessResult = await response.json();
       if (result) {
         //
+        console.log(result, 'result')
         const businesses = result.meals;
         const categories = businesses.map((b: Business) => {
           return b.strCategory;
@@ -110,7 +112,10 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
                   <div className="w-full">
                     <div className="flex justify-between mb-[20px]">
                       <div>
-                        <h1 className="font-semibold text-[24px] mb-[4px] font-header">{b.strMeal}</h1>
+                        <h1 className="font-semibold text-[24px] mb-[4px] font-header">
+                          {b.strMeal}
+                          <span className="text-[14px] text-gray-300 ml-[4px] hover:text-gray-800 font-secondary">#{b.idMeal}</span>
+                        </h1>
                         <div className="text-[15px] space-x-[6px] font-semibold font-header">
                           <span className="font-semibold">Category: {b.strCategory}</span>
                           <span>
