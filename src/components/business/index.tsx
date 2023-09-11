@@ -90,7 +90,7 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
   }, [selectedCategory, selectedCountry, searchValue, setLoadingBusiness])
 
   return (
-    <section className="px-[60px] py-[40px] flex gap-x-[30px]">
+    <section className="px-[20px] sm:px-[60px] py-[40px] flex gap-x-[30px]">
       <div className="w-full">
         <header className="flex justify-between font-bold py-[15px] ">
           <div>{filterBusiness().length} business found</div>
@@ -135,14 +135,13 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
               </div>
             ) : (
               <div>
-                Loading
-                
+                Loading...
               </div>
             )
           }
         </div>
       </div>
-      <div className="max-w-[300px] w-full">
+      <div className="max-w-[300px] w-full hidden lg:block">
         <div className="border-[1px] rounded-lg min-h-[200px]">
           <div className="flex flex-wrap justify-between border-b-[1px] p-[15px] font-semibold">
             <p>Filter</p>
