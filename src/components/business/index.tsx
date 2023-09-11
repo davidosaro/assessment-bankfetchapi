@@ -65,7 +65,8 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
   }
   const filterBusiness = () => {
     return business.filter((b: Business) => {
-      return b.strMeal?.toLowerCase().indexOf(searchValue?.toLowerCase()) != -1 &&
+      return (b.strMeal?.toLowerCase().indexOf(searchValue?.toLowerCase()) != -1 || 
+      b.strCategory?.toLowerCase().indexOf(searchValue?.toLowerCase()) != -1) &&
       b.strArea?.toLowerCase().indexOf(selectedCountry?.toLowerCase()) != -1 && 
       b.strCategory?.toLowerCase().indexOf(selectedCategory?.toLowerCase()) != -1
     })
