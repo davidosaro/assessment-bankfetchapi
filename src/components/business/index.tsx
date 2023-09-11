@@ -1,44 +1,106 @@
 import { faBookmark } from "@fortawesome/free-regular-svg-icons";
 import { faAngleDown, faCircle, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useState } from "react";
+import { request } from "../../api/apiService";
+import { MEAL } from "../../api/apiURL.js";
 
-export default function Businesses() {
+interface businessProps {
+  searchValue?: string;
+  setLoadingBusiness?(state: boolean): void;
+}
+
+export default function Businesses({searchValue = "", setLoadingBusiness = () => {}}: businessProps) {
+  const [business, setBusiness] = useState(Array<object>);
+  const [loading, setLoading] = useState(false);
+
+  interface Business {
+    strMealThumb?: string,
+    strMeal?: string,
+    strArea?: string,
+    strCategory?: string,
+    strInstructions?: string,
+  }
+  interface BusinessResult {
+    meals: Array<object>
+  }
+  const getBusiness = async() => {
+    try {
+      setLoading(true)
+      const response: Response = await request(MEAL.FINDALL);
+      const result: BusinessResult = await response.json();
+      if (result) {
+        //
+        console.log(result.meals, 'meal')
+        setLoading(false)
+        setBusiness(result.meals)
+        setLoadingBusiness(false);
+      } else {
+        throw new Error("Something went wrong")
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setLoading(false)
+        console.log(error.message, "error")
+      }
+    }
+  }
+  const filterBusiness = () => {
+    return business.filter((b: Business) => b.strMeal?.toLowerCase().indexOf(searchValue?.toLowerCase()) != -1)
+  }
+  useEffect(()=> {
+    getBusiness()
+  }, [])
   return (
     <section className="px-[60px] py-[40px] flex gap-x-[30px]">
       <div className="w-full">
         <header className="flex justify-between font-bold py-[15px] ">
-          <div>250 business found</div>
+          <div>{filterBusiness().length} business found</div>
           <div>
             Relevant
             <FontAwesomeIcon icon={faAngleDown} className="ml-[8px]"/>
           </div>
         </header>
         <div>
-          <div className="border-[1px] rounded-lg min-h-[200px] p-[20px] pl-0">
-            <div className="flex">
-              <div className="w-[100px] p-[20px]"><img src="https://99designs-blog.imgix.net/blog/wp-content/uploads/2022/05/Shell_logo.svg-e1659037248878.png?auto=format&q=60&fit=max&w=930" alt="Image" className="w-full"/></div>
-              <div className="w-full">
-                <div className="flex justify-between mb-[20px]">
-                  <div>
-                    <h1 className="font-semibold text-[24px] mb-[4px] font-header">Shell</h1>
-                    <div className="text-[15px] space-x-[6px] font-semibold font-header">
-                      <span className="font-semibold">Best Community Services</span>
-                      <span>
-                        <FontAwesomeIcon icon={faCircle} className="w-[5px]"/>
+          {
+            !loading ? filterBusiness().length > 0 ? filterBusiness().map((b: Business) => (
+
+              <div className="border-[1px] rounded-lg h-[200px] p-[20px] pl-0">
+                <div className="flex">
+                  <div className="w-[100px] px-[20px] py-[10px]"><img src={b.strMealThumb} alt="Image" className="w-full rounded-lg"/></div>
+                  <div className="w-full">
+                    <div className="flex justify-between mb-[20px]">
+                      <div>
+                        <h1 className="font-semibold text-[24px] mb-[4px] font-header">{b.strMeal}</h1>
+                        <div className="text-[15px] space-x-[6px] font-semibold font-header">
+                          <span className="font-semibold">Category: {b.strCategory}</span>
+                          <span>
+                            <FontAwesomeIcon icon={faCircle} className="w-[5px]"/>
+                          </span>
+                          <span className="text-green-800">{b.strArea}</span>
+                        </div>
+                      </div>
+                      <span className="bg-gray-100 px-[12px] py-[10px] h-fit rounded-lg cursor-pointer">
+                        <FontAwesomeIcon icon={faBookmark} size="lg"/>
                       </span>
-                      <span className="text-green-800">Lagos, Nigeria</span>
+                    </div>
+                    <div className="font-secondary text-gray-500 text-[15px] line-clamp-3">
+                      {b.strInstructions}
                     </div>
                   </div>
-                  <span className="bg-gray-100 px-[12px] py-[10px] h-fit rounded-lg cursor-pointer">
-                    <FontAwesomeIcon icon={faBookmark} size="lg"/>
-                  </span>
-                </div>
-                <div className="font-secondary text-gray-500 text-[15px]">
-                Tailwind CSS Dropdown. Use responsive dropdown component with helper examples for dropdown menu, select dropdown, dropdown nav & more. Free download, open-
                 </div>
               </div>
-            </div>
-          </div>
+            ))
+             : (
+              <div>
+                Not Found
+              </div>
+            ) : (
+              <div>
+                Loading
+              </div>
+            )
+          }
         </div>
       </div>
       <div className="max-w-[300px] w-full">
