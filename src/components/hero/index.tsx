@@ -1,11 +1,22 @@
+import { faGlobe } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Button from "../inputs/Button";
 
 export default function Hero() {
   return (
-    <section className="px-[60px] py-[30px] bg-gray-50 flex flex-col items-center justify-center">
+    <section className="px-[60px] pt-[50px] pb-[80px] bg-gray-50 flex flex-col items-center justify-center">
       <div className="text-[42px] font-header font-semibold pt-[20px]">
         Discover Business all over the world
       </div>
-      <p>.banklify - a modern platform, where you can search for businesses based on their name or category</p>
+      <p className="font-secondary mb-[60px]">.banklify - a modern platform, where you can search for businesses based on their name or category</p>
+      <div className="sticky top-0 w-full max-w-[1000px] border-[2px] border-black rounded-full p-[15px] flex items-center justify-between">
+        <div className="w-full px-[20px] flex gap-x-[20px] items-center bg-gray-50">
+          <FontAwesomeIcon icon={faGlobe} size="lg"/>
+          <input type="text" placeholder="What business are you looking for today?"
+          className="outline-none bg-transparent w-full" />
+        </div>
+        <Button text="Search" className="w-[150px]" />
+      </div>
     </section>
   )
 }
