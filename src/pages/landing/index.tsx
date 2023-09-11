@@ -1,15 +1,11 @@
-import { useEffect } from 'react'
-import { print } from './script'
+import Navbar from '../../components/navbar';
+import Hero from '../../components/hero';
 
 function App() {
-  useEffect(()=> {
-    print()
-  })
   return (
     <>
-    <div className='font-medium'>
-      asd123
-    </div>
+      <Navbar />
+      <Hero />
     </>
   )
 }
