@@ -14,6 +14,11 @@ interface businessProps {
 export default function Businesses({searchValue = "", setLoadingBusiness = () => {}}: businessProps) {
   const [business, setBusiness] = useState(Array<object>);
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState(Array<string>);
+  const [countries, setCountries] = useState(Array<string>);
+
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
 
   interface Business {
     strMealThumb?: string,
@@ -32,8 +37,21 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
       const result: BusinessResult = await response.json();
       if (result) {
         //
+        const businesses = result.meals;
+        const categories = businesses.map((b: Business) => {
+          return b.strCategory;
+        })
+        const countries = businesses.map((b: Business) => {
+          return b.strArea;
+        })
+
+        const noDuplicateCategories = [...new Set(categories)] as string[];
+        const noDuplicateCountries = [...new Set(countries)] as string[];
+
+        setCategories(noDuplicateCategories);
+        setCountries(noDuplicateCountries)
         setLoading(false)
-        setBusiness(result.meals)
+        setBusiness(businesses)
         setLoadingBusiness(false);
       } else {
         throw new Error("Something went wrong")
@@ -46,11 +64,31 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
     }
   }
   const filterBusiness = () => {
-    return business.filter((b: Business) => b.strMeal?.toLowerCase().indexOf(searchValue?.toLowerCase()) != -1)
+    return business.filter((b: Business) => {
+      return b.strMeal?.toLowerCase().indexOf(searchValue?.toLowerCase()) != -1 &&
+      b.strArea?.toLowerCase().indexOf(selectedCountry?.toLowerCase()) != -1 && 
+      b.strCategory?.toLowerCase().indexOf(selectedCategory?.toLowerCase()) != -1
+    })
+  }
+  
+  const clearFilter = () => {
+    setSelectedCategory("");
+    setSelectedCountry("");
   }
   useEffect(()=> {
     getBusiness()
   }, [])
+
+  //loading animation
+  useEffect(() => {
+    setLoadingBusiness(true);
+    setLoading(true)
+    setTimeout(()=> {
+      setLoading(false)
+      setLoadingBusiness(false);
+    }, 1000)
+  }, [selectedCategory, selectedCountry, searchValue, setLoadingBusiness])
+
   return (
     <section className="px-[60px] py-[40px] flex gap-x-[30px]">
       <div className="w-full">
@@ -61,7 +99,7 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
             <FontAwesomeIcon icon={faAngleDown} className="ml-[8px]"/>
           </div>
         </header>
-        <div>
+        <div className="space-y-[20px]">
           {
             !loading ? filterBusiness().length > 0 ? filterBusiness().map((b: Business) => (
 
@@ -98,6 +136,7 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
             ) : (
               <div>
                 Loading
+                
               </div>
             )
           }
@@ -107,18 +146,19 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
         <div className="border-[1px] rounded-lg min-h-[200px]">
           <div className="flex flex-wrap justify-between border-b-[1px] p-[15px] font-semibold">
             <p>Filter</p>
-            <p className="text-red-600">Clear all</p>
+            <p className="text-red-600 cursor-pointer" onClick={clearFilter}>Clear all</p>
           </div>
 
           <div className="border-b-[1px] px-[15px] py-[20px] ">
             <p className="font-semibold mb-[10px]">Categories</p>
             <div className="bg-gray-100 p-[10px] rounded-lg border-gray-200 border-[1px]">
-              <select id="countries" className="bg-transparent w-full font-medium">
+              <select id="countries" value={selectedCategory} className="bg-transparent w-full font-medium outline-none" onChange={(e) => setSelectedCategory(e.target.value)}>
                 <option selected>Select Category</option>
-                <option value="US">United States</option>
-                <option value="CA">Canada</option>
-                <option value="FR">France</option>
-                <option value="DE">Germany</option>
+                {
+                  categories.map((cat) => (
+                    <option value={cat}>{cat}</option>
+                  ))
+                }
               </select>
             </div>
           </div>
@@ -127,17 +167,18 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
             <p className="font-semibold mb-[10px]">Country</p>
             <div className="bg-gray-100 p-[10px] rounded-lg border-gray-200 border-[1px] flex gap-x-[4px] items-center">
             <FontAwesomeIcon icon={faLocationDot} />
-              <select id="countries" className="bg-transparent w-full font-medium">
+              <select id="countries" value={selectedCountry} className="bg-transparent w-full font-medium outline-none" onChange={(e) => setSelectedCountry(e.target.value)}>
                 <option selected>Choose a country</option>
-                <option value="US">United States</option>
-                <option value="CA">Canada</option>
-                <option value="FR">France</option>
-                <option value="DE">Germany</option>
+                {
+                  countries.map((country) => (
+                    <option value={country}>{country}</option>
+                  ))
+                }
               </select>
             </div>
           </div>
 
-          <div className="border-b-[1px] px-[15px] py-[20px] ">
+          {/* <div className="border-b-[1px] px-[15px] py-[20px] ">
             <p className="font-semibold mb-[10px]">City</p>
             <div className="bg-gray-100 p-[10px] rounded-lg border-gray-200 border-[1px]">
               <select id="countries" className="bg-transparent w-full font-medium">
@@ -148,10 +189,10 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
                 <option value="DE">Germany</option>
               </select>
             </div>
-          </div>
+          </div> */}
 
 
-          <div className="border-b-[1px] px-[15px] py-[20px] ">
+          {/* <div className="border-b-[1px] px-[15px] py-[20px] ">
             <p className="font-semibold mb-[10px]">Size</p>
             <div className="bg-gray-100 p-[10px] rounded-lg border-gray-200 border-[1px]">
               <select id="countries" className="bg-transparent w-full font-medium">
@@ -162,9 +203,9 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
                 <option value="DE">Germany</option>
               </select>
             </div>
-          </div>
+          </div> */}
 
-          <div className="border-b-[1px] px-[15px] py-[20px] ">
+          {/* <div className="border-b-[1px] px-[15px] py-[20px] ">
             <p className="font-semibold mb-[10px]">Type</p>
             <div className="bg-gray-100 p-[10px] rounded-lg border-gray-200 border-[1px]">
               <select id="countries" className="bg-transparent w-full font-medium">
@@ -175,7 +216,7 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
                 <option value="DE">Germany</option>
               </select>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
