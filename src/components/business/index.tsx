@@ -38,7 +38,6 @@ export default function Businesses({searchValue = "", setLoadingBusiness = () =>
       const result: BusinessResult = await response.json();
       if (result) {
         //
-        console.log(result, 'result')
         const businesses = result.meals;
         const categories = businesses.map((b: Business) => {
           return b.strCategory;
